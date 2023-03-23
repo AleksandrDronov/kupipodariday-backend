@@ -35,6 +35,8 @@ export class OffersService {
       offer.user = user;
       offer.item = wish;
       wish.raised = Number(wish.raised) + amount;
+      if (wish.raised > wish.price)
+        throw new BadRequestException('Cумма превышает необходимую');
       await this.wishRepository.save(wish);
       return this.offerRepository.save(offer);
     }
