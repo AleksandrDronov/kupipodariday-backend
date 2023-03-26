@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  Injectable,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from '../users/entities/user.entity';
 import { Repository } from 'typeorm';
@@ -108,7 +112,13 @@ export class WishesService {
       },
     });
     if (!wish) throw new BadRequestException('Подарка с таким id не найдено');
-    return await this.wishRepository.remove(wish);
+    try {
+      return await this.wishRepository.remove(wish);
+    } catch (err) {
+      throw new ConflictException(
+        'Нельзя удалить подарок на который уже скинулись',
+      );
+    }
   }
 
   async copy(id: number, userId: number) {
